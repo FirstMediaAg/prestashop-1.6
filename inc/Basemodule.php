@@ -5,7 +5,7 @@
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
- * @copyright 2017 - 2020 customweb GmbH
+ * @copyright 2017 - 2019 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
@@ -73,7 +73,9 @@ class WalleeBasemodule
         
     private static $recordMailMessages = false;
 
-    private static $recordedMailMessages = array();
+	private static $recordedMailMessages = array();
+	
+	const FM_ENABLE_ORDER_EDIT = true;
 
     public static function install(Wallee $module)
     {
@@ -1954,7 +1956,7 @@ class WalleeBasemodule
             'addProductOnOrder'
         ))) {
             $order = new Order((int) Tools::getValue('id_order'));
-            if ($order->module != $module->name) {
+            if (($order->module != $module->name) || (self::FM_ENABLE_ORDER_EDIT)) {
                 return;
             }
             WalleeHelper::startDBTransaction();
