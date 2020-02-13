@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>wallee</name>
+	<displayName><![CDATA[wallee1]]></displayName>
+	<version><![CDATA[1.1.14]]></version>
+	<description><![CDATA[Dieses PrestaShop-Modul erm&ouml;glicht die Verarbeitung von Zahlungen mit wallee.]]></description>
+	<author><![CDATA[Customweb GmbH]]></author>
+	<tab><![CDATA[payments_gateways]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to uninstall the wallee module?]]></confirmUninstall>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

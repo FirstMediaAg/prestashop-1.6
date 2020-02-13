@@ -390,7 +390,13 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
 
     public function checkTransactionPending(Cart $cart)
     {
-        $ids = WalleeHelper::getCartMeta($cart, 'mappingIds');
+		$ids = WalleeHelper::getCartMeta($cart, 'mappingIds');
+		// JOS
+		if ($ids === null) {
+			// CREATE Transaction
+			$transaction = $this->createTransactionFromCart($cart);
+			$ids = WalleeHelper::getCartMeta($cart, 'mappingIds');
+		}
         $transaction = $this->getTransaction($ids['spaceId'], $ids['transactionId']);
         if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
             throw new Exception(
@@ -549,8 +555,13 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
         $spaceId = Configuration::get(WalleeBasemodule::CK_SPACE_ID, null, $cart->id_shop_group, $cart->id_shop);
         $createTransaction = new \Wallee\Sdk\Model\TransactionCreate();
         $createTransaction->setCustomersPresence(\Wallee\Sdk\Model\CustomersPresence::VIRTUAL_PRESENT);
-        $createTransaction->setAutoConfirmationEnabled(false);
-        $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wle_device_id);
+		$createTransaction->setAutoConfirmationEnabled(false);
+		$device_id = Context::getContext()->cookie->wle_device_id;
+		// JOS
+		if (!$device_id) {
+			$device_id = WalleeHelper::generateUUID();
+		}
+        $createTransaction->setDeviceSessionIdentifier($device_id);
 
         $spaceViewId = Configuration::get(WalleeBasemodule::CK_SPACE_VIEW_ID, null, null, $cart->id_shop);
         if (! empty($spaceViewId)) {

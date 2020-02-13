@@ -1499,7 +1499,10 @@ class WalleeBasemodule
             );
             $module->getContext()->controller->addCSS(
                 __PS_BASE_URI__ . 'modules/' . $module->name . '/views/css/admin/jAlert.css'
-            );
+			);
+			$module->getContext()->controller->addJS(
+				__PS_BASE_URI__ . 'modules/' . $module->name . '/views/js/admin/order.moto.js'
+			);
         }
         $module->getContext()->controller->addJS(__PS_BASE_URI__ . 'modules/' . $module->name . '/views/js/admin/general.js');
     }
@@ -1538,7 +1541,8 @@ class WalleeBasemodule
         self::handleVoucherAddRequest($module);
         self::handleVoucherDeleteRequest($module);
         self::handleRefundRequest($module);
-        self::handleCancelProductRequest($module);
+		self::handleCancelProductRequest($module);
+		self::handleMotoOrderRequest($module);
     }
 
 
@@ -1674,7 +1678,21 @@ class WalleeBasemodule
                 $backendController->errors[] = Tools::displayError('You do not have permission to delete this.');
             }
         }
-    }
+	}
+	
+	private static function handleMotoOrderRequest(Wallee $module) {
+		// self::installControllers($module);
+		if (array_key_exists('addorder', $_GET)) {
+			// add AJAX URL
+			echo '<script>
+				var wallee_admin_order_link = "' . $module->getContext()->link->getAdminLink('AdminWalleeMotoOrder', true) . '";
+				</script>';
+		}
+
+		if (Tools::isSubmit('submitAddOrder')) {
+			// echo '<script>alert("hey");</script>';
+		}
+	}
 
     /**
      * Show the manual task in the admin bar.

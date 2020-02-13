@@ -21,7 +21,16 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
     {
         $orderId = Tools::getValue('order_id', null);
         $orderKey = Tools::getValue('secret', null);
-        $action = Tools::getValue('action', null);
+		$action = Tools::getValue('action', null);
+		
+		// redirect to Admim if MOTO order
+		$cookie = new Cookie('psAdmin', '', (int)Configuration::get('PS_COOKIE_LIFETIME_BO'));
+		if (isset($cookie->wallee_moto_redirect) && $orderId !== null) {
+			unset($cookie->wallee_moto_redirect);
+			$url = $cookie->wallee_moto_redirect . '&id_order='. $orderId . '&vieworder';
+			header("Location: " . $url, true, 301);
+			exit();
+		}
 
         if ($orderId != null) {
             $order = new Order($orderId);
@@ -43,7 +52,7 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
         }
         $error = Tools::displayError('Invalid Request.');
         die($error);
-    }
+	}
 
     private function processSuccess(Order $order)
     {

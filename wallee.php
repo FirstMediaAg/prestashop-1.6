@@ -127,6 +127,10 @@ class Wallee extends PaymentModule
             'AdminWalleeOrder' => array(
                 'parentId' => - 1, // No Tab in navigation
                 'name' => 'wallee ' . $this->l('Order Management')
+			),
+			'AdminWalleeMotoOrder' => array(
+                'parentId' => - 1, // No Tab in navigation
+                'name' => 'wallee ' . $this->l('Order Management')
             ),
             'AdminWalleeCronJobs' => array(
                 'parentId' => Tab::getIdFromClassName('AdminTools'),
@@ -562,7 +566,29 @@ class Wallee extends PaymentModule
         $secure_key = false,
         Shop $shop = null
     ) {
-        WalleeBasemodule::validateOrder($this, $id_cart, $id_order_state, $amount_paid, $payment_method, $message, $extra_vars, $currency_special, $dont_touch_amount, $secure_key, $shop);
+		if (array_key_exists('wallee_moto_payment_method', $_POST)) {
+			$payment_method = Tools::getValue('wallee_moto_payment_method');
+		}
+		
+		WalleeBasemodule::validateOrder($this, $id_cart, $id_order_state, $amount_paid, $payment_method, $message, $extra_vars, $currency_special, $dont_touch_amount, $secure_key, $shop);
+		
+		// redirect MOTO
+		if (array_key_exists('wallee_moto_payment_method', $_POST)) {
+			// store url for success redirect in cookie (after wallee)
+			$url = AdminController::$currentIndex;
+			$admin = explode(DIRECTORY_SEPARATOR,_PS_ADMIN_DIR_);
+			$admin_folder = array_pop((array_slice($admin, -1)));
+			$url = _PS_BASE_URL_ . __PS_BASE_URI__. $admin_folder . '/' . $url . '&token=' . Tools::getAdminTokenLite('AdminOrders');
+			Context::getContext()->cookie->wallee_moto_redirect = $url;
+
+			// redirect to wallee
+			$url = WalleeServiceTransaction::instance()->getPaymentPageUrl(
+				$GLOBALS['walleeTransactionIds']['spaceId'],
+				$GLOBALS['walleeTransactionIds']['transactionId']
+			);
+			header("Location: " . $url, true, 301);
+			exit();
+		}
     }
     
     public function validateOrderParent(
@@ -628,5 +654,5 @@ class Wallee extends PaymentModule
     public function hookActionOrderEdited($params)
     {
         WalleeBasemodule::hookActionOrderEdited($this, $params);
-    }
+	}
 }
